@@ -506,5 +506,6 @@ st.markdown("""
 2. Click "Start Detection" for videos or "Run Detection" for images
 
 **Expected Classes:**
-Based on your training configuration, this model detects .
+This model detects OxygenTank,NitrogenTank ,FirstAidBox , FireAlarm , SafetySwitchPanel , EmergencyPhone , FireExtinguisher 
+
 """)
