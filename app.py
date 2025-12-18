@@ -11,6 +11,15 @@ import io
 # Fixed model configuration
 MODEL_PATH = "models/best.pt"
 DEFAULT_CONFIDENCE = 0.25
+ALLOWED_CLASSES = {
+    "OxygenTank",
+    "NitrogenTank",
+    "FirstAidBox",
+    "FireAlarm",
+    "SafetySwitchPanel",
+    "EmergencyPhone",
+    "FireExtinguisher",
+}
 
 # Set page configuration
 st.set_page_config(
@@ -62,16 +71,6 @@ with st.sidebar:
     st.divider()
     st.markdown("### Detection Statistics")
     stats_placeholder = st.empty()
-
-# st.markdown(
-#     """
-#     <style>
-#     [data-testid="stSidebar"] {display: none;}
-#     [data-testid="collapsedControl"] {display: none;}
-#     </style>
-#     """,
-#     unsafe_allow_html=True,
-# )
 
 # Initialize session state
 if 'detections_history' not in st.session_state:
@@ -246,6 +245,10 @@ def process_video(video_path, model):
                 else:
                     class_name = f"Class_{cls_id}"
                 
+                # Skip detections that are not in the approved list
+                if class_name not in ALLOWED_CLASSES:
+                    continue
+                
                 # Store detection
                 detection = {
                     'class': class_name,
@@ -373,7 +376,7 @@ def render_detection_list(detections):
         
         detection_list.markdown(detection_text)
     else:
-        detection_list.empty()
+        detection_list.markdown("### No safety objects are found")
 
 
 # Function to update statistics
@@ -426,6 +429,11 @@ def process_image(image_bytes, model):
         for box, conf, cls_id in zip(boxes, confidences, class_ids):
             x1, y1, x2, y2 = map(int, box)
             class_name = st.session_state.class_names.get(cls_id, f"Class_{cls_id}") if st.session_state.class_names else f"Class_{cls_id}"
+            
+            # Skip detections that are not in the approved list
+            if class_name not in ALLOWED_CLASSES:
+                continue
+            
             detection = {
                 'class': class_name,
                 'confidence': float(conf),
@@ -500,13 +508,3 @@ st.markdown("""
 **Expected Classes:**
 Based on your training configuration, this model detects .
 """)
-
-st.markdown(
-    """
-    <style>
-    [data-testid="stSidebar"] {display: none;}
-    [data-testid="collapsedControl"] {display: none;}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
