@@ -229,22 +229,92 @@ The model was evaluated on a dedicated test set using standard object detection 
 
 *Note: Actual metrics can be found in `models/training/runs/train/yolo11m_space_run/results.csv`*
 
-### Testing Methodology
+### 📊 Performance Curves
 
-1. **Test Set Evaluation**
-   - Model tested on unseen images
-   - Predictions saved in `testing_results/runs/detect/val/`
-   - Bounding boxes and labels generated
+#### Precision–Recall Curve
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/BoxPR_curve.png" width="600">
+  <br>
+  <em>Precision vs Recall trade-off across confidence thresholds</em>
+</p>
 
-2. **Confidence Threshold Testing**
-   - Default threshold: 0.25
-   - Tested range: 0.05 - 0.95
-   - Optimal threshold determined through validation
+#### Precision Curve
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/BoxP_curve.png" width="600">
+  <br>
+  <em>Precision variation of the model across thresholds</em>
+</p>
 
-3. **Real-world Testing**
-   - Video stream processing
-   - Live camera feed testing
-   - FPS performance monitoring
+#### Recall Curve
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/BoxR_curve.png" width="600">
+  <br>
+  <em>Recall performance indicating the model’s ability to detect relevant objects</em>
+</p>
+
+#### F1 Score Curve
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/BoxF1_curve.png" width="600">
+  <br>
+  <em>F1 score curve showing the balance between precision and recall</em>
+</p>
+
+---
+
+### 🔍 Confusion Matrix Analysis
+
+#### Confusion Matrix
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/confusion_matrix.png" width="500">
+  <br>
+  <em>Confusion matrix representing class-wise predictions</em>
+</p>
+
+#### Normalized Confusion Matrix
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/confusion_matrix_normalized.png" width="500">
+  <br>
+  <em>Normalized confusion matrix highlighting relative class performance</em>
+</p>
+
+---
+
+### 🖼️ Qualitative Results (Ground Truth vs Predictions)
+
+#### Ground Truth Annotations
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/val_batch0_labels.jpg" width="600">
+  <br>
+  <em>Ground truth labels for validation batch</em>
+</p>
+
+#### Model Predictions
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/val_batch0_pred.jpg" width="600">
+  <br>
+  <em>Model predictions on the same validation images</em>
+</p>
+
+#### Additional Validation Samples
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/val_batch1_labels.jpg" width="600">
+  <br>
+  <em>Additional ground truth annotations</em>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Subho4531/Safety-Object-Detection/master/testing_reasults/runs/detect/val/val_batch1_pred.jpg" width="600">
+  <br>
+  <em>Corresponding model predictions</em>
+</p>
+
+---
+
+### ✅ Summary of Results
+- The model demonstrates a strong balance between precision and recall  
+- Confusion matrices show low misclassification rates  
+- Visual comparisons confirm accurate object localization and detection  
+- Overall validation results indicate reliable and consistent performance
 
 ### Prediction System
 
