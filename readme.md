@@ -1,12 +1,10 @@
 # Safety Equipment Detection System ⛑️
 
-A computer vision system for real-time detection and monitoring of safety equipment using YOLO11 deep learning model. This project aims to enhance workplace safety by automatically identifying and tracking safety gear compliance through images and video streams.
+A computer vision system for real-time detection and monitoring of safety equipment using YOLO11 deep learning model with <b>93% accuracy </b>. This project aims to enhance workplace safety by automatically identifying and tracking safety gear compliance through images and video streams.
 
 ---
 
 ## 📋 Table of Contents
-- [Problem Statement](#problem-statement)
-- [Solution Overview](#solution-overview)
 - [System Architecture](#system-architecture)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
@@ -20,26 +18,6 @@ A computer vision system for real-time detection and monitoring of safety equipm
 - [Future Improvements](#future-improvements)
 
 ---
-
-## 🎯 Problem Statement
-
-Workplace safety is a critical concern across industries such as construction, manufacturing, and healthcare. Manual monitoring of safety equipment compliance is:
-- **Time-consuming** and labor-intensive
-- **Error-prone** due to human oversight
-- **Inconsistent** across different shifts and locations
-- **Difficult to scale** for large facilities
-
-The lack of automated safety monitoring can lead to:
-- Increased workplace accidents and injuries
-- Regulatory compliance violations
-- Higher insurance costs
-- Potential legal liabilities
-
-This project addresses these challenges by providing an automated, real-time safety equipment detection system.
-
----
-
-## 💡 Solution Overview
 
 The Safety Equipment Detection System uses state-of-the-art computer vision technology to automatically detect and monitor safety equipment in real-time. The solution:
 
