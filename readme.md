@@ -2,6 +2,15 @@
 
 A computer vision system for real-time detection and monitoring of safety equipment using YOLO11 deep learning model with <b>93% accuracy </b>. This project aims to enhance workplace safety by automatically identifying and tracking safety gear compliance through images and video streams.
 
+### 🎬 Demo Video
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/13V--dpmoqjjwmrTrwi64l5YQeRaIQQFZ/view?usp=sharing" target="_blank">
+    <img src="https://img.shields.io/badge/▶%20Watch%20Demo-Video-red?style=for-the-badge">
+  </a>
+</p>
+
+
 ---
 
 ## 📋 Table of Contents
