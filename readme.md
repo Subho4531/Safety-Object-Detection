@@ -230,11 +230,11 @@ The model was evaluated on a dedicated test set using standard object detection 
 
 | Metric | Value | Description |
 |--------|-------|-------------|
-| **mAP@50** | TBD | Mean Average Precision at IoU threshold 0.5 |
-| **mAP@50-95** | TBD | Mean Average Precision across IoU thresholds 0.5 to 0.95 |
-| **Precision** | TBD | Ratio of true positive detections |
-| **Recall** | TBD | Ratio of detected objects to ground truth |
-| **Inference Speed** | TBD | Frames processed per second |
+| **mAP@50** | 0.858| Mean Average Precision at IoU threshold 0.5 |
+| **mAP@50-95** | 0.756 | Mean Average Precision across IoU thresholds 0.5 to 0.95 |
+| **Precision** | 0.93 | Ratio of true positive detections |
+| **Recall** | 0.77 | Ratio of detected objects to ground truth |
+| **Inference Speed** | 14.5 | Frames processed per second |
 
 *Note: Actual metrics can be found in `models/training/runs/train/yolo11m_space_run/results.csv`*
 
