@@ -1,0 +1,5 @@
+train: #path to training folder(s)
+val: #path to validation folder(s)
+test: "Duality Dataset\\test\\"
+nc: 7
+names: ['OxygenTank', 'NitrogenTank', 'FirstAidBox', 'FireAlarm', 'SafetySwitchPanel', 'EmergencyPhone', 'FireExtinguisher']                                         

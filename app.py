@@ -11,25 +11,17 @@ import io
 # Fixed model configuration
 MODEL_PATH = "models/best.pt"
 DEFAULT_CONFIDENCE = 0.25
-ALLOWED_CLASSES = {
-    "OxygenTank",
-    "NitrogenTank",
-    "FirstAidBox",
-    "FireAlarm",
-    "SafetySwitchPanel",
-    "EmergencyPhone",
-    "FireExtinguisher",
-}
+# Allow all classes detected by the model (no manual filtering)
 
 # Set page configuration
 st.set_page_config(
-    page_title="Safety Object Detection",
+    page_title="Safety Equipment Detection System",
     page_icon="⛑️",
     layout="wide"
 )
 
 # Title and description
-st.title("Safety Object Detection")
+st.title("Safety Equipment Detection System ⛑️")
 st.markdown("Upload a video or image to detect safety-related objects using the built-in YOLO11 model")
 
 # Sidebar for controls
@@ -42,6 +34,15 @@ with st.sidebar:
     show_fps = st.checkbox("Show FPS", value=True)
     show_labels = st.checkbox("Show Labels", value=True)
     show_confidence = st.checkbox("Show Confidence Scores", value=True)
+    confidence_slider = st.slider(
+        "Confidence Threshold",
+        min_value=0.05,
+        max_value=0.95,
+        value=DEFAULT_CONFIDENCE,
+        step=0.05,
+        help="Minimum confidence score required to display a detection"
+    )
+    st.session_state.confidence = confidence_slider
     
     # Model info section
     st.divider()
@@ -81,6 +82,14 @@ if 'processing' not in st.session_state:
     st.session_state.processing = False
 if 'class_names' not in st.session_state:
     st.session_state.class_names = {}
+if 'live_camera_on' not in st.session_state:
+    st.session_state.live_camera_on = False
+if 'cap' not in st.session_state:
+    st.session_state.cap = None
+if 'camera_frame_counter' not in st.session_state:
+    st.session_state.camera_frame_counter = 0
+if 'camera_last_time' not in st.session_state:
+    st.session_state.camera_last_time = time.time()
 
 # Load custom YOLO model
 @st.cache_resource
@@ -171,6 +180,13 @@ with col1:
             type=['mp4', 'avi', 'mov', 'mkv', 'webm'],
             key="video_uploader"
         )
+        # Live Camera option (mutually exclusive with video processing)
+        camera_btn = st.button(
+            "📷 Use Live Camera",
+            type="secondary",
+            help="Start real-time detection using your webcam",
+            disabled=(model is None) or st.session_state.processing or st.session_state.live_camera_on
+        )
     else:
         uploaded_image = st.file_uploader(
             "Choose an image file",
@@ -188,13 +204,14 @@ with col1:
     with col1_1:
         if input_mode == "Video":
             start_btn = st.button("▶️ Start Detection", type="primary", 
-                                 disabled=not uploaded_video or model is None)
+                                 disabled=(not uploaded_video) or (model is None) or st.session_state.live_camera_on)
         else:
             detect_image_btn = st.button("🔍 Run Detection", type="primary",
                                          disabled=not uploaded_image or model is None)
     with col1_2:
         if input_mode == "Video":
             stop_btn = st.button("⏹️ Stop", disabled=not st.session_state.processing)
+            stop_camera_btn = st.button("⏹️ Stop Camera", disabled=not st.session_state.live_camera_on)
         else:
             st.button("⏸️ Stop", disabled=True)
     with col1_3:
@@ -226,7 +243,7 @@ def process_video(video_path, model):
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
         # Run YOLO inference with custom model
-        results = model(frame_rgb, conf=DEFAULT_CONFIDENCE, verbose=False)[0]
+        results = model(frame_rgb, conf=st.session_state.get('confidence', DEFAULT_CONFIDENCE), verbose=False)[0]
         
         # Extract detections
         detections = []
@@ -245,9 +262,7 @@ def process_video(video_path, model):
                 else:
                     class_name = f"Class_{cls_id}"
                 
-                # Skip detections that are not in the approved list
-                if class_name not in ALLOWED_CLASSES:
-                    continue
+                # No manual class filtering; include all detected classes
                 
                 # Store detection
                 detection = {
@@ -419,7 +434,7 @@ def process_image(image_bytes, model):
     
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     frame_rgb = np.array(image)
-    results = model(frame_rgb, conf=DEFAULT_CONFIDENCE, verbose=False)[0]
+    results = model(frame_rgb, conf=st.session_state.get('confidence', DEFAULT_CONFIDENCE), verbose=False)[0]
     detections = []
     if results.boxes is not None:
         boxes = results.boxes.xyxy.cpu().numpy()
@@ -430,9 +445,7 @@ def process_image(image_bytes, model):
             x1, y1, x2, y2 = map(int, box)
             class_name = st.session_state.class_names.get(cls_id, f"Class_{cls_id}") if st.session_state.class_names else f"Class_{cls_id}"
             
-            # Skip detections that are not in the approved list
-            if class_name not in ALLOWED_CLASSES:
-                continue
+            # No manual class filtering; include all detected classes
             
             detection = {
                 'class': class_name,
@@ -465,6 +478,12 @@ def process_image(image_bytes, model):
 
 # Button handlers
 if input_mode == "Video" and start_btn and uploaded_video and model:
+    # Ensure live camera is off when processing a video file
+    if st.session_state.live_camera_on:
+        if st.session_state.cap:
+            st.session_state.cap.release()
+            st.session_state.cap = None
+        st.session_state.live_camera_on = False
     st.session_state.processing = True
     
     # Save uploaded file temporarily
@@ -482,6 +501,117 @@ if stop_btn:
     st.session_state.processing = False
     st.rerun()
 
+"""
+Live camera start/stop handlers and single-frame processing loop.
+This uses opencv-python-headless VideoCapture and avoids any GUI calls.
+"""
+if input_mode == "Video" and 'camera_btn' in locals() and camera_btn and model:
+    # Start live camera mode
+    st.session_state.live_camera_on = True
+    st.session_state.processing = False
+    # Initialize camera if needed
+    if st.session_state.cap is None or (not hasattr(st.session_state.cap, 'isOpened')) or (not st.session_state.cap.isOpened()):
+        st.session_state.cap = cv2.VideoCapture(0)
+    if (st.session_state.cap is None) or (not st.session_state.cap.isOpened()):
+        st.session_state.live_camera_on = False
+        st.session_state.cap = None
+        st.error("❌ Unable to access webcam. Ensure a camera is connected and not in use by another app.")
+    else:
+        st.info("📷 Live camera started")
+
+if input_mode == "Video" and 'stop_camera_btn' in locals() and stop_camera_btn:
+    # Stop live camera mode
+    st.session_state.live_camera_on = False
+    if st.session_state.cap:
+        try:
+            st.session_state.cap.release()
+        except Exception:
+            pass
+        st.session_state.cap = None
+    st.rerun()
+
+# Live camera processing: process a single frame per run and rerun for smooth updates
+if input_mode == "Video" and st.session_state.live_camera_on and model:
+    cap = st.session_state.cap
+    if cap is None or (not cap.isOpened()):
+        # Try to (re)initialize the camera
+        st.session_state.cap = cv2.VideoCapture(0)
+        cap = st.session_state.cap
+        if cap is None or (not cap.isOpened()):
+            st.error("❌ Unable to access webcam.")
+            st.session_state.live_camera_on = False
+    else:
+        MAX_FRAMES_PER_RUN = 15
+        processed = 0
+        while processed < MAX_FRAMES_PER_RUN and st.session_state.live_camera_on and cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                st.warning("⚠️ Unable to read frame from webcam.")
+                break
+
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            st.session_state.camera_frame_counter += 1
+            run_inference = (st.session_state.camera_frame_counter % 2 == 0)
+            detections = []
+            if run_inference:
+                results = model(frame_rgb, conf=st.session_state.get('confidence', DEFAULT_CONFIDENCE), verbose=False)[0]
+                if results.boxes is not None:
+                    boxes = results.boxes.xyxy.cpu().numpy()
+                    confidences = results.boxes.conf.cpu().numpy()
+                    class_ids = results.boxes.cls.cpu().numpy().astype(int)
+                    for box, conf, cls_id in zip(boxes, confidences, class_ids):
+                        x1, y1, x2, y2 = map(int, box)
+                        class_name = st.session_state.class_names.get(cls_id, f"Class_{cls_id}") if st.session_state.class_names else f"Class_{cls_id}"
+                        # No manual class filtering; include all detected classes
+                        detection = {
+                            'class': class_name,
+                            'confidence': float(conf),
+                            'bbox': (x1, y1, x2, y2),
+                            'frame': st.session_state.camera_frame_counter,
+                            'class_id': int(cls_id)
+                        }
+                        detections.append(detection)
+                        total_classes = len(st.session_state.class_names) if st.session_state.class_names else 10
+                        color = get_class_color(cls_id, total_classes)
+                        cv2.rectangle(frame_rgb, (x1, y1), (x2, y2), color, 2)
+                        label = f"{class_name}"
+                        if show_confidence:
+                            label += f" {conf:.2f}"
+                        font = cv2.FONT_HERSHEY_SIMPLEX
+                        font_scale = 0.6
+                        thickness = 2
+                        (label_width, label_height), baseline = cv2.getTextSize(label, font, font_scale, thickness)
+                        label_y = max(y1 - 10, label_height + 5)
+                        cv2.rectangle(frame_rgb, (x1, label_y - label_height - 5), (x1 + label_width + 10, label_y + 5), color, -1)
+                        cv2.putText(frame_rgb, label, (x1 + 5, label_y), font, font_scale, (255, 255, 255), thickness)
+
+            if show_fps:
+                now = time.time()
+                fps_display = 1 / (now - st.session_state.camera_last_time) if st.session_state.camera_last_time else 0
+                st.session_state.camera_last_time = now
+                cv2.putText(
+                    frame_rgb,
+                    f"FPS: {fps_display:.1f}",
+                    (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8,
+                    (0, 255, 0),
+                    2
+                )
+
+            st.session_state.current_frame = frame_rgb
+            st.session_state.detections_history.extend(detections)
+            pil_image = Image.fromarray(frame_rgb)
+            media_placeholder.image(pil_image, caption="Live Camera Detection", use_container_width=True)
+            render_detection_list(detections)
+            update_statistics()
+
+            processed += 1
+            time.sleep(0.03)
+
+        # After processing a chunk of frames, rerun once to handle UI events
+        if st.session_state.live_camera_on:
+            st.rerun()
 if clear_btn:
     st.session_state.detections_history = []
     st.session_state.current_frame = None
