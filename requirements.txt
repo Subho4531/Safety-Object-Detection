@@ -5,3 +5,6 @@ ultralytics
 pillow
 pandas
 pyyaml
+
+
+# For GPU support with Ultralytics, you may need to install torch and torchvision separately based on your CUDA version.
