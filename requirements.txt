@@ -1,5 +1,5 @@
 streamlit
-opencv-python-headless
+opencv-python-headless==4.9.0.80
 numpy
 ultralytics
 pillow
@@ -7,4 +7,3 @@ pandas
 pyyaml
 
 
-# For GPU support with Ultralytics, you may need to install torch and torchvision separately based on your CUDA version.
