@@ -5,17 +5,17 @@ A computer vision system for real-time detection and monitoring of safety equipm
 ---
 
 ## 📋 Table of Contents
-- [System Architecture](#system-architecture)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Dataset](#dataset)
-- [Model Information](#model-information)
-- [Testing and Results](#testing-and-results)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Limitations](#limitations)
-- [Future Improvements](#future-improvements)
+- [System Architecture](#-system-architecture)
+- [Features](#-features)
+- [Technologies Used](#-technologies-used)
+- [Dataset](#-dataset)
+- [Model Information](#-model-information)
+- [Testing and Results](#-testing-and-results)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Project Structure](#-project-structure)
+- [Limitations](#-limitations)
+- [Future Improvements](#-future-improvements)
 
 ---
 
