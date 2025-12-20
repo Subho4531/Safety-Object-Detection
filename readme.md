@@ -10,7 +10,7 @@ A computer vision system for real-time detection and monitoring of safety equipm
     <img src="https://img.shields.io/badge/Safety%20Equipment%20Detection%20Report-blue?style=for-the-badge">
   </a>
   <a href="https://github.com/Subho4531/Safety-Object-Detection?tab=readme-ov-file#-testing-and-results" target="_blank">
-    <img src="https://img.shields.io/badge/Testing%20Reasults%20Report-blue?style=for-the-badge">
+    <img src="https://img.shields.io/badge/Testing%20Reasults%20Report-green?style=for-the-badge">
   </a>
 </p>
 
